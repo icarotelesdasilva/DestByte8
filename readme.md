@@ -1,16 +1,13 @@
-DestByte8
+# DestByte8
 
+DestByte8 is a custom 8-bit CPU architecture built entirely from scratch, designed for general-purpose computing.
 
-And a project for a CPU with a custom architecture, built entirely by hand with the goal of being used for general-purpose computing.
+## Project Objective
+To design, implement, and evolve a custom instruction set architecture (ISA) and processor core from the ground up.
 
+## Documentation & Roadmap
+* **Architecture:** 8-bit custom ISA (subject to change during development).
+* **Current Status:** Initial design and implementation phase.
 
-Project objective:
-
-The project aims to create a CPU with a custom architecture—a serious, general-purpose processor designed for general use.
-
-Official documentation for Destbyte8 (subject to change in the future):
-
-The CPU will be 8-bit and have its own architecture.
-
-
-This project is protected by the: CERN Open Hardware Licence Version 2 - Strongly Reciprocal
+## License
+This project is protected by the **CERN Open Hardware Licence Version 2 - Strongly Reciprocal**.
