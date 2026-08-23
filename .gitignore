@@ -1,12 +1,9 @@
-obj_dir/
-*.cpp
-*.h
-*.mk
-*.dat
-*.out
 
+obj_dir/
 
 Vcpu
+*.out
+*.dat
 *.vpp
 *.preload
 
