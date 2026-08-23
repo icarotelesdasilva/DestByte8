@@ -1,6 +1,11 @@
+
 #include "Vtop.h"
 #include "verilated.h"
 #include <iostream>
+
+// Copyright (C) 2026 icaro teles da silva ribeiro (@icarotelesdasilva)
+// Licensed under the CERN Open Hardware Licence Version 2 - Strongly Reciprocal (CERN-OHL-S)
+
 
 int main(int argc, char** argv) {
     Verilated::commandArgs(argc, argv);
