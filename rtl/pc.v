@@ -15,29 +15,3 @@ always @(posedge clk or posedge reset) begin
     end
 
 endmodule
-
-
-
-
-module rom (
-
-input wire [7:0] addr,
-output reg [7:0] data
-
-
-);
-
-reg [7:0] memory [255:0];
-
-initial begin
-$readmemh("boot.hex", memory);
-    end
-
-    always @(*) begin
-    data = memory[addr];
-    
-        end
-        end
-                endmodule
-
-
