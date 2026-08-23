@@ -1,3 +1,8 @@
+// Copyright (C) 2026 icaro teles da silva ribeiro (@icarotelesdasilva)
+// Licensed under the CERN Open Hardware Licence Version 2 - Strongly Reciprocal (CERN-OHL-S)
+
+
+
 module top (
     input wire clk,
     input wire reset,
