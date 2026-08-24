@@ -1,4 +1,4 @@
-name: architecture CI
+Name: architecture CI
 
 on:
   push:
@@ -12,10 +12,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
       - uses: veryl-lang/setup-verilator@v1
-        with:
-          version: 5.026
 
       - name: Install dependencies
         run: |
@@ -29,4 +26,3 @@ jobs:
       - name: Run Simulation
         run: |
           ./obj_dir/Vtop
-
