@@ -1,4 +1,5 @@
 # DestByte8
+[![architecture CI](https://github.com/icarotelesdasilva/DestByte8/actions/workflows/architecture.yml/badge.svg)](https://github.com/icarotelesdasilva/DestByte8/actions/workflows/architecture.yml)
 
 DestByte8 is a 8-bit CPU architecture built entirely from scratch, designed for general-purpose computing.
 
