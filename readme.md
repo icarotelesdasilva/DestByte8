@@ -6,10 +6,5 @@ DestByte8 is a 8-bit CPU architecture built entirely from scratch, designed for 
 ## Project Objective
 To design, implement, and evolve a  instruction set architecture (ISA) and processor core from the ground up.
 
-## Documentation & Roadmap
-* **Architecture:** 8-bit custom ISA.
-  
-* **Current Status:** Initial design and implementation phase.
-
 ## License
 This project is protected by the **CERN Open Hardware Licence Version 2 - Strongly Reciprocal**.
