@@ -1,1 +1,32 @@
+name: architecture CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-and-simulate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: veryl-lang/setup-verilator@v1
+        with:
+          version: 5.026
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libfl2 libfl-dev
+
+      - name: Run Verilator Build
+        run: |
+          verilator --cc --exe --build sim/sim_main.cpp rtl/top.v rtl/pc.v rom/rom.v rtl/decoder.v alu/alu.v
+
+      - name: Run Simulation
+        run: |
+          ./obj_dir/Vtop
 
