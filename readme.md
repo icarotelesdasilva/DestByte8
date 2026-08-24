@@ -1,5 +1,5 @@
 # DestByte8
-[![architecture CI](https://github.com/icarotelesdasilva/DestByte8/actions/workflows/architecture.yml/badge.svg)](https://github.com/icarotelesdasilva/DestByte8/actions/workflows/architecture.yml)
+[![architecture CI](https://github.com)](https://github.com)
 
 DestByte8 is a 8-bit CPU architecture built entirely from scratch, designed for general-purpose computing.
 
@@ -8,7 +8,7 @@ To design, implement, and evolve a  instruction set architecture (ISA) and proce
 
 ## Documentation
 
-For detailed technical specifications, instructions, and implementation details, please refer to the [documentation.md](./documentation.md) file.
+For detailed technical specifications, instructions, and implementation details, please refer to the [documentation.md](./documentation/documentation.md) file.
 
 ## License
 This project is protected by the **CERN Open Hardware Licence Version 2 - Strongly Reciprocal**.
