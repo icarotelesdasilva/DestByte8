@@ -1,4 +1,4 @@
-Name: architecture CI
+name: architecture CI
 
 on:
   push:
