@@ -21,7 +21,7 @@ jobs:
 
       - name: Run Verilator Build
         run: |
-          verilator -Wall --cc --exe --build sim/sim_main.cpp rtl/*.v memory/*.v rom/*.v alu/*.v
+          verilator -Wall --cc --exe --build --top-module top sim/sim_main.cpp rtl/*.v memory/*.v rom/*.v alu/*.v
 
       - name: Run Simulation
         run: |
