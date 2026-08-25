@@ -8,7 +8,7 @@ module rom (
     output wire [7:0] data
 );
 
-    reg [7:0] memory [255:0];
+    reg [7:0] memory [0:255];
 
     initial begin
         memory[0] = 8'h00; 

@@ -18,12 +18,12 @@ always @(*) begin
     reg_we      = 1'b0;
 
     case (instruction[7:6])
-        2'b00: begin // Exemplo: ADD T_dest, T_src
+        2'b00: begin
             alu_control = 3'b000;
             reg_we      = 1'b1;  
         end
         
-        2'b01: begin // Exemplo: SUB T_dest, T_src
+        2'b01: begin 
             alu_control = 3'b001; 
             reg_we      = 1'b1;
         end

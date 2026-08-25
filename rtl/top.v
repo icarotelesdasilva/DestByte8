@@ -40,7 +40,7 @@ module top (
 
     registers_memory m_regs (
         .clk(clk),
-        .we(reg_we),           
+        .we(reg_we & ~reset),           
         .w_addr(w_addr),       
         .r_addr1(r_addr1),     
         .r_addr2(r_addr2),     
