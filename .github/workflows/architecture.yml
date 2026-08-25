@@ -21,8 +21,8 @@ jobs:
 
       - name: Run Verilator Build
         run: |
-          verilator -Wall -cc rtl/top.v --exe sim/sim_main.cpp -Irtl -Imemory -Irom -Ialu
-          
+          verilator -Wall --cc --exe --build sim/sim_main.cpp rtl/*.v memory/*.v rom/*.v alu/*.v
+
       - name: Run Simulation
         run: |
           ./obj_dir/Vtop
