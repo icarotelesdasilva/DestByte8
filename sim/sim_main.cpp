@@ -1,11 +1,9 @@
-
 #include "Vtop.h"
 #include "verilated.h"
 #include <iostream>
 
 // Copyright (C) 2026 icaro teles da silva ribeiro (@icarotelesdasilva)
 // Licensed under the CERN Open Hardware Licence Version 2 - Strongly Reciprocal (CERN-OHL-S)
-
 
 int main(int argc, char** argv) {
     Verilated::commandArgs(argc, argv);
@@ -23,9 +21,9 @@ int main(int argc, char** argv) {
         top->eval();
 
         if (top->clk == 1) {
-            std::cout << "Ciclo: " << cycle 
+            std::cout << "Cicle: " << cycle 
                       << " | Reset: " << (int)top->reset 
-                      << " | Resultado ULA: " << (int)top->resultado_final << std::endl;
+                      << " | RESULT f: " << (int)top->result << std::endl;
         }
         cycle++;
     }
