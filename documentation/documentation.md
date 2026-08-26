@@ -1,28 +1,14 @@
-Roadmap Documentation and Architecture:  8-bit ISA. 
+DestByte8 é uma arquitetura de processador de 8 bits desenvolvida do zero, com o objetivo de constituir uma arquitetura de propósito geral e evoluir tanto a sua ISA (Instruction Set Architecture) quanto sua implementação de hardware.
 
-Current Status: Initial design and 
+A implementação atual é descrita em Verilog RTL e é organizada em módulos independentes correspondentes às principais unidades do processador, incluindo:
 
-implementation phase, contains below 
-general-purpose 8bit loggers (all are general-purpose.):
+* contador de programa;
+* ROM de instruções;
+* decodificador de instruções;
+* banco de registradores;
+* unidade lógica e aritmética (ALU);
+* interconexão principal do processador.
 
-T0 GENERAL USE
+A arquitetura não deve ser confundida com um simulador. O RTL constitui a descrição estrutural/comportamental do hardware digital da CPU. O diretório sim, quando existente no projeto, deve ser tratado separadamente como infraestrutura de verificação/desenvolvimento, e não como definição da CPU.
 
-T1 GENERAL USE
-
-T2 GENERAL USE
-
-T3 GENERAL USE
-
-T4 GENERAL USE 
-
-T5 GENERAL USE
-
-T6 GENERAL USE
-
-T7 GENERAL USE
-
- 
-
-NOTE: In the future the registrars will change their objectives, so it will be updated in the future, but for now they are for general use.
-
-That's all for now.
+O repositório identifica explicitamente o DestByte8 como uma CPU de 8 bits construída inteiramente do zero. 
