@@ -5,6 +5,7 @@ Current Status: Initial design and
 implementation phase, contains below 
 general-purpose 8bit loggers (all are general-purpose.):
 
+T0 GENERAL USE
 
 T1 GENERAL USE
 
@@ -20,7 +21,7 @@ T6 GENERAL USE
 
 T7 GENERAL USE
 
-T8 GENERAL USE
+ 
 
 NOTE: In the future the registrars will change their objectives, so it will be updated in the future, but for now they are for general use.
 
