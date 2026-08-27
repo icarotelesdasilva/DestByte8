@@ -1,29 +1,32 @@
 #!/usr/bin/env bash
 
+clear
+
 read -r -p "Do you want to build DestByte8? (yes/no): " answer
 
 case "$answer" in
     yes|y|YES|Y)
         echo "Building DestByte8 with Verilator..."
 
-        verilator --cc --exe --build \
-            --trace --trace-structs \
-            --timing \
-            -Wall \
-            -Wno-fatal \
-            -O3 \
-            --x-assign fast \
-            --x-initial fast \
-            --top-module top \
-            -Mdir ./obj_dir \
-            -o ./cpu_sim \
-            ./rtl/top.v \
-            ./rtl/decoder.v \
-            ./rtl/pc.v \
-            ./alu/alu.v \
-            ./memory/registers_memory.v \
-            ./rom/rom.v \
-            ./sim/sim_main.cpp
+verilator --cc --exe --build \
+    --trace --trace-structs \
+    --timing \
+    -Wall \
+    -Wno-fatal \
+    -O3 \
+    --x-assign fast \
+    --x-initial fast \
+    --top-module top \
+    -Mdir ./obj_dir \
+    -o ./cpu_sim \
+    ./rtl/top.v \
+    ./rtl/pc_next.v \
+    ./rtl/decoder.v \
+    ./rtl/pc.v \
+    ./alu/alu.v \
+    ./memory/registers_memory.v \
+    ./rom/rom.v \
+    ./sim/sim_main.cpp
 
         if [[ $? -ne 0 ]]; then
             echo "Build failed."

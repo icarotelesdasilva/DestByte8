@@ -13,18 +13,23 @@ int main(int argc, char** argv) {
     top->reset = 1;
 
     int cycle = 0;
+
     while (cycle < 20) {
         top->clk ^= 1;
-        
-        if (cycle == 4) top->reset = 0;
+
+        if (cycle == 4)
+            top->reset = 0;
 
         top->eval();
 
         if (top->clk == 1) {
-            std::cout << "Cicle: " << cycle 
-                      << " | Reset: " << (int)top->reset 
-                      << " | RESULT f: " << (int)top->result << std::endl;
+           std::cout << "Cycle: " << std::dec << cycle
+          << " | Reset: " << (int)top->reset
+          << " | PC: " << std::hex << (int)top->pc_debug
+          << " | RESULT: " << (int)top->result
+          << std::endl;
         }
+
         cycle++;
     }
 

@@ -4,9 +4,10 @@
 module top (
     input wire clk,
     input wire reset,
-    output wire [7:0] result
+    output wire [7:0] result,
+    output wire [7:0] pc_debug
 );
-
+    wire [7:0] next_pc;
     wire [7:0] end_pc;
     wire [7:0] dd;          
     wire [2:0] cf;         
@@ -18,11 +19,17 @@ module top (
     wire [7:0] r_data2;
     wire [7:0] alu_result;
 
-    pc my_pc (
-        .clk(clk),
-        .reset(reset),
-        .pc_out(end_pc)    
-    );
+pc my_pc (
+    .clk(clk),
+    .reset(reset),
+    .pc_out(end_pc),
+    .pc_next(next_pc)
+);
+
+pc_next my_pc_next (
+    .pc(end_pc),
+    .pc_next(next_pc)
+);
 
     rom m_rom (
         .addr(end_pc),     
@@ -58,5 +65,7 @@ registers_memory m_regs (
     );
 
     assign result = alu_result;
+    assign result = alu_result;
+    assign pc_debug = end_pc;
 
 endmodule
