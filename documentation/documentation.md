@@ -3868,4 +3868,4 @@ DestByte8 is in an early stage of development. The original project documentatio
 
 This specification should therefore be understood as a technical snapshot of the current implementation and as a foundation for the formal evolution of the architecture.
 
-DestByte8 ISA/Architecture Draft 0.1.
+DestByte8 ISA/Architecture Draft 0.2.
