@@ -1,3 +1,1347 @@
+# DestByte8 CPU Architecture Specification
+
+**Architecture:** DestByte8
+**Class:** 8-bit CPU
+**Instruction width:** 8 bits
+**Data width:** 8 bits
+**Register count:** 8
+**Register width:** 8 bits
+**Program Counter width:** 8 bits
+**Instruction memory:** 256 × 8 bits
+**ISA status:** Initial implementation
+**Hardware description:** Verilog RTL
+**Hardware license:** CERN Open Hardware Licence Version 2 — Strongly Reciprocal (CERN-OHL-S)
+
+---
+
+## 1. Overview
+
+DestByte8 is an 8-bit processor architecture designed and implemented from scratch.
+
+The architecture uses fixed-width 8-bit instructions and 8-bit data.
+
+The current instruction execution path consists of:
+
+```text
+PC
+ ↓
+Instruction ROM
+ ↓
+Decoder
+ ↓
+Register File
+ ↓
+ALU
+ ↓
+Register File
+```
+
+The current RTL implementation contains:
+
+* Program Counter;
+* PC-next logic;
+* instruction ROM;
+* instruction decoder;
+* register file;
+* arithmetic logic unit (ALU);
+* top-level CPU interconnection.
+
+The ISA defines the architectural behavior. The Verilog RTL is the current implementation of that behavior.
+
+Features that are not defined by the ISA are considered implementation details unless explicitly specified.
+
+---
+
+# 2. Architectural Parameters
+
+| Feature             | Current specification |
+| ------------------- | --------------------- |
+| Data width          | 8 bits                |
+| Instruction width   | 8 bits                |
+| Program Counter     | 8 bits                |
+| Registers           | 8                     |
+| Register names      | T0–T7                 |
+| Register width      | 8 bits                |
+| Register selector   | 3 bits                |
+| ALU input width     | 8 bits                |
+| ALU result width    | 8 bits                |
+| ALU control         | 3 bits                |
+| Instruction opcode  | 2 bits                |
+| Instruction memory  | 256 × 8 bits          |
+| Instruction address | 8 bits                |
+| Flags               | Not implemented       |
+| Stack pointer       | Not implemented       |
+| Interrupts          | Not implemented       |
+| Data RAM            | Not implemented       |
+| Branch instructions | Not implemented       |
+
+---
+
+# 3. Register File
+
+DestByte8 contains eight general-purpose registers:
+
+```text
+T0
+T1
+T2
+T3
+T4
+T5
+T6
+T7
+```
+
+Each register stores one 8-bit value.
+
+A register is selected using a 3-bit register selector.
+
+| Selector | Register |
+| -------- | -------- |
+| `000`    | T0       |
+| `001`    | T1       |
+| `010`    | T2       |
+| `011`    | T3       |
+| `100`    | T4       |
+| `101`    | T5       |
+| `110`    | T6       |
+| `111`    | T7       |
+
+All eight registers are therefore directly addressable.
+
+## 3.1 Register File Ports
+
+The current register file provides:
+
+* one synchronous write port;
+* two combinational read ports.
+
+Conceptually:
+
+```text
+r_addr1 → r_data1
+r_addr2 → r_data2
+
+w_addr  → destination register
+w_data  → data written
+we      → write enable
+clk     → clock
+reset   → reset
+```
+
+The two read addresses independently select two registers.
+
+For an instruction using destination field `D` and source field `S`:
+
+```text
+r_addr1 = D
+r_addr2 = S
+w_addr  = D
+```
+
+The intended architectural write-back operation is therefore:
+
+```text
+T[D] ← ALU result
+```
+
+Writes occur on the active clock edge when write enable is asserted.
+
+The current RTL also clears the register file during reset.
+
+---
+
+# 4. Instruction Format
+
+Every DestByte8 instruction occupies exactly one byte.
+
+```text
+Bit:     7 6 | 5 4 3 | 2 1 0
+        ─────┼───────┼───────
+        OPC  │   D   │   S
+```
+
+The instruction is divided into three fields:
+
+| Bits    | Field  |  Width | Purpose                         |
+| ------- | ------ | -----: | ------------------------------- |
+| `[7:6]` | OPCODE | 2 bits | Selects the operation           |
+| `[5:3]` | D      | 3 bits | Destination / first ALU operand |
+| `[2:0]` | S      | 3 bits | Second ALU operand              |
+
+Total:
+
+```text
+2 + 3 + 3 = 8 bits
+```
+
+The current instruction format contains:
+
+* no immediate field;
+* no memory-address field;
+* no operand-size field.
+
+---
+
+# 5. Instruction Encoding
+
+The two most significant bits select the instruction group:
+
+```text
+OPCODE = instruction[7:6]
+D      = instruction[5:3]
+S      = instruction[2:0]
+```
+
+Current allocation:
+
+| Opcode | Instruction | Status      |
+| ------ | ----------- | ----------- |
+| `00`   | ADD         | Implemented |
+| `01`   | SUB         | Implemented |
+| `10`   | —           | Reserved    |
+| `11`   | —           | Reserved    |
+
+---
+
+# 6. ADD
+
+## Encoding
+
+```text
+00 DDD SSS
+```
+
+## Semantics
+
+```text
+T[D] ← T[D] + T[S]
+```
+
+The `D` field has two roles:
+
+1. selects the first ALU operand;
+2. selects the destination register.
+
+The `S` field selects the second ALU operand.
+
+### Example
+
+Given:
+
+```text
+T0 = 5
+T1 = 3
+```
+
+Instruction:
+
+```text
+00 000 001
+```
+
+Fields:
+
+```text
+OPCODE = 00
+D      = 000 → T0
+S      = 001 → T1
+```
+
+Execution:
+
+```text
+T0 ← T0 + T1
+T0 ← 5 + 3
+T0 ← 8
+```
+
+Encoding:
+
+```text
+00000001 = 0x01
+```
+
+Therefore:
+
+```text
+0x01 = ADD T0,T1
+```
+
+---
+
+# 7. SUB
+
+## Encoding
+
+```text
+01 DDD SSS
+```
+
+## Semantics
+
+```text
+T[D] ← T[D] - T[S]
+```
+
+### Example
+
+Given:
+
+```text
+T2 = 10
+T3 = 4
+```
+
+Instruction:
+
+```text
+01 010 011
+```
+
+Fields:
+
+```text
+OPCODE = 01
+D      = 010 → T2
+S      = 011 → T3
+```
+
+Execution:
+
+```text
+T2 ← T2 - T3
+T2 ← 10 - 4
+T2 ← 6
+```
+
+Encoding:
+
+```text
+01010011 = 0x53
+```
+
+Therefore:
+
+```text
+0x53 = SUB T2,T3
+```
+
+---
+
+# 8. Complete Opcode Space
+
+Because the opcode contains two bits, there are four opcode groups.
+
+Each group contains:
+
+```text
+8 × 8 = 64
+```
+
+possible register combinations.
+
+Current allocation:
+
+```text
+0x00–0x3F = ADD
+0x40–0x7F = SUB
+0x80–0xBF = RESERVED
+0xC0–0xFF = RESERVED
+```
+
+Therefore:
+
+```text
+64 ADD encodings
+64 SUB encodings
+128 reserved encodings
+```
+
+---
+
+# 9. ADD Encoding Range
+
+All instructions with opcode `00` are ADD instructions.
+
+Range:
+
+```text
+0x00–0x3F
+```
+
+General encoding:
+
+```text
+00 DDD SSS
+```
+
+Examples:
+
+| Byte   | Binary     | Instruction |
+| ------ | ---------- | ----------- |
+| `0x00` | `00000000` | `ADD T0,T0` |
+| `0x01` | `00000001` | `ADD T0,T1` |
+| `0x02` | `00000010` | `ADD T0,T2` |
+| `0x07` | `00000111` | `ADD T0,T7` |
+| `0x08` | `00001000` | `ADD T1,T0` |
+| `0x10` | `00010000` | `ADD T2,T0` |
+| `0x18` | `00011000` | `ADD T3,T0` |
+| `0x20` | `00100000` | `ADD T4,T0` |
+| `0x28` | `00101000` | `ADD T5,T0` |
+| `0x30` | `00110000` | `ADD T6,T0` |
+| `0x38` | `00111000` | `ADD T7,T0` |
+| `0x3F` | `00111111` | `ADD T7,T7` |
+
+---
+
+# 10. SUB Encoding Range
+
+All instructions with opcode `01` are SUB instructions.
+
+Range:
+
+```text
+0x40–0x7F
+```
+
+General encoding:
+
+```text
+01 DDD SSS
+```
+
+Examples:
+
+| Byte   | Binary     | Instruction |
+| ------ | ---------- | ----------- |
+| `0x40` | `01000000` | `SUB T0,T0` |
+| `0x41` | `01000001` | `SUB T0,T1` |
+| `0x42` | `01000010` | `SUB T0,T2` |
+| `0x48` | `01001000` | `SUB T1,T0` |
+| `0x50` | `01010000` | `SUB T2,T0` |
+| `0x53` | `01010011` | `SUB T2,T3` |
+| `0x60` | `01100000` | `SUB T4,T0` |
+| `0x70` | `01110000` | `SUB T6,T0` |
+| `0x78` | `01111000` | `SUB T7,T0` |
+| `0x7F` | `01111111` | `SUB T7,T7` |
+
+---
+
+# 11. Reserved Opcode Space
+
+The opcode values:
+
+```text
+10
+11
+```
+
+are reserved.
+
+Corresponding ranges:
+
+```text
+0x80–0xBF
+0xC0–0xFF
+```
+
+These encodings currently do not define architectural instructions.
+
+The current decoder disables register writes for these opcode values.
+
+Software must not depend on the current internal behavior of reserved encodings.
+
+Future ISA revisions may assign these opcode groups to new instructions.
+
+---
+
+# 12. Decoder
+
+The decoder receives the complete instruction:
+
+```text
+instruction[7:0]
+```
+
+It produces:
+
+```text
+alu_control
+w_addr
+r_addr1
+r_addr2
+reg_we
+```
+
+Current field extraction:
+
+```text
+w_addr  = instruction[5:3]
+r_addr1 = instruction[5:3]
+r_addr2 = instruction[2:0]
+```
+
+Therefore:
+
+```text
+w_addr  = D
+r_addr1 = D
+r_addr2 = S
+```
+
+Current control mapping:
+
+| Opcode | `alu_control` | `reg_we` |
+| ------ | ------------- | -------: |
+| `00`   | `000`         |      `1` |
+| `01`   | `001`         |      `1` |
+| `10`   | `000`         |      `0` |
+| `11`   | `000`         |      `0` |
+
+The decoder initializes its outputs to safe default values and disables register writes for unsupported opcode groups.
+
+---
+
+# 13. ALU
+
+The ALU receives two 8-bit operands:
+
+```text
+A[7:0]
+B[7:0]
+```
+
+and a 3-bit operation selector:
+
+```text
+alu_control[2:0]
+```
+
+It produces an 8-bit result:
+
+```text
+result[7:0]
+```
+
+Current operation mapping:
+
+| `alu_control` | Operation |
+| ------------- | --------- |
+| `000`         | `A + B`   |
+| `001`         | `A - B`   |
+| Other         | `0x00`    |
+
+The current ALU does not expose arithmetic flags.
+
+There are currently no architectural:
+
+* Zero flag;
+* Carry flag;
+* Borrow flag;
+* Negative/Sign flag;
+* Overflow flag.
+
+Arithmetic results are limited to eight bits.
+
+Therefore, the implemented arithmetic naturally retains the lower eight bits of the result.
+
+Example:
+
+```text
+0xFF + 0x01 = 0x00
+```
+
+because the ninth carry bit is not part of the current ALU result.
+
+---
+
+# 14. Program Counter
+
+The Program Counter is 8 bits wide.
+
+Its address range is:
+
+```text
+0x00–0xFF
+```
+
+The current PC implementation provides:
+
+```text
+clk
+reset
+pc_next
+pc_out
+```
+
+The PC receives the next value generated by the PC-next logic.
+
+Current sequential execution uses:
+
+```text
+PC_next = PC + 1
+```
+
+Therefore, in the absence of another control-flow mechanism:
+
+```text
+PC ← PC + 1
+```
+
+The PC supplies the instruction ROM address:
+
+```text
+PC → ROM.addr
+```
+
+The current ISA contains no instruction that modifies the PC.
+
+---
+
+# 15. PC-Next Logic
+
+The current PC-next module implements simple sequential advancement:
+
+```text
+pc_next = pc + 8'd1
+```
+
+The logic is combinational.
+
+It does not currently implement:
+
+* branches;
+* jumps;
+* calls;
+* returns;
+* conditional control flow.
+
+A future control unit may replace or control this simple sequential path when additional control-flow instructions are introduced.
+
+---
+
+# 16. Instruction ROM
+
+The instruction ROM contains:
+
+```text
+256 entries × 8 bits
+```
+
+Address width:
+
+```text
+8 bits
+```
+
+Data width:
+
+```text
+8 bits
+```
+
+Connection:
+
+```text
+PC → ROM address
+ROM → instruction
+```
+
+The current ROM implementation explicitly initializes only selected addresses.
+
+Current initialization:
+
+```text
+Address    Byte
+0x00       0x00
+0x01       0x20
+```
+
+These bytes decode according to the current ISA as:
+
+```text
+0x00 → ADD T0,T0
+0x20 → ADD T4,T0
+```
+
+Only explicitly initialized ROM contents are defined by the current ROM source.
+
+Uninitialized locations must not be treated as valid program instructions.
+
+---
+
+# 17. Current ROM Program
+
+The current ROM program contains:
+
+```text
+Address   Byte
+----------------
+0x00      0x00
+0x01      0x20
+```
+
+## Address `0x00`
+
+```text
+0x00
+00000000
+```
+
+Fields:
+
+```text
+OPCODE = 00
+D      = 000 → T0
+S      = 000 → T0
+```
+
+Instruction:
+
+```text
+ADD T0,T0
+```
+
+Intended architectural operation:
+
+```text
+T0 ← T0 + T0
+```
+
+## Address `0x01`
+
+```text
+0x20
+00100000
+```
+
+Fields:
+
+```text
+OPCODE = 00
+D      = 100 → T4
+S      = 000 → T0
+```
+
+Instruction:
+
+```text
+ADD T4,T0
+```
+
+Intended architectural operation:
+
+```text
+T4 ← T4 + T0
+```
+
+Therefore the intended two-instruction sequence is:
+
+```text
+T0 ← T0 + T0
+T4 ← T4 + T0
+```
+
+The actual execution of this sequence must be verified by simulation.
+
+---
+
+# 18. Datapath
+
+The current processor datapath is:
+
+```text
+             ┌────────────┐
+             │     PC     │
+             └─────┬──────┘
+                   │
+                   ▼
+             ┌────────────┐
+             │    ROM     │
+             └─────┬──────┘
+                   │
+             instruction
+                   │
+                   ▼
+             ┌────────────┐
+             │  DECODER   │
+             └──┬─────┬───┘
+                │     │
+          register   control
+           fields
+                │     │
+                ▼     ▼
+          ┌────────────────┐
+          │ REGISTER FILE  │
+          └──────┬───┬─────┘
+                 │   │
+                 A   B
+                  \ /
+                   ▼
+              ┌─────────┐
+              │   ALU   │
+              └────┬────┘
+                   │
+              ALU result
+                   │
+                   ▼
+          ┌────────────────┐
+          │ REGISTER FILE  │
+          └────────────────┘
+```
+
+The current top-level CPU also exposes the ALU result through:
+
+```text
+result[7:0]
+```
+
+The PC may additionally be exposed through a debug output in the RTL implementation.
+
+A debug signal is not automatically part of the ISA.
+
+
+
+# 19. Instruction Execution
+
+The current intended execution process is divided into the following logical stages.
+
+## 19.1 Fetch
+
+The PC supplies the ROM address:
+
+```text
+PC → ROM
+```
+
+The ROM provides one instruction byte:
+
+```text
+ROM → instruction
+```
+
+## 19.2 Decode
+
+The decoder extracts:
+
+```text
+opcode = instruction[7:6]
+D      = instruction[5:3]
+S      = instruction[2:0]
+```
+
+It then generates the register addresses and ALU control.
+
+## 19.3 Register Read
+
+The register file provides:
+
+```text
+A = T[D]
+B = T[S]
+```
+
+## 19.4 Execute
+
+The ALU performs the operation selected by the opcode:
+
+```text
+ADD:
+A + B
+
+SUB:
+A - B
+```
+
+## 19.5 Write Back
+
+For the currently implemented ADD and SUB instructions:
+
+```text
+T[D] ← ALU result
+```
+
+## 19.6 PC Update
+
+The current sequential PC logic generates:
+
+```text
+PC_next = PC + 1
+```
+
+The PC therefore advances to the next instruction.
+
+
+
+# 20. Reset
+
+Reset behavior is part of the RTL implementation and must be distinguished from ISA semantics.
+
+The current implementation resets the PC to:
+
+```text
+0x00
+```
+
+The register file is also reset to:
+
+```text
+T0 = 0x00
+T1 = 0x00
+T2 = 0x00
+T3 = 0x00
+T4 = 0x00
+T5 = 0x00
+T6 = 0x00
+T7 = 0x00
+```
+
+Register writes are disabled while reset is asserted through the top-level write-enable condition:
+
+```text
+reg_we & ~reset
+```
+
+The exact synchronous/asynchronous timing semantics of reset are determined by the sequential RTL implementation.
+
+
+
+# 21. CPU Interface
+
+The current top-level CPU exposes:
+
+```text
+input  clk
+input  reset
+output [7:0] result
+```
+
+The RTL may also expose debug signals such as:
+
+```text
+pc_debug[7:0]
+```
+
+## `clk`
+
+System clock.
+
+## `reset`
+
+Processor reset input.
+
+## `result`
+
+Current ALU result.
+
+## `pc_debug`
+
+Current PC value for simulation/debugging when present in the RTL.
+
+`pc_debug` is an implementation/debug interface and is not an architectural register or ISA instruction field.
+
+
+
+# 22. Architectural State
+
+The current architectural register state consists of:
+
+```text
+T0
+T1
+T2
+T3
+T4
+T5
+T6
+T7
+```
+
+The PC is also processor state used to determine the next instruction.
+
+Each state element is 8 bits wide.
+
+The architecture currently defines no:
+
+* flag register;
+* status register;
+* stack pointer;
+* general-purpose memory state.
+
+
+
+# 23. Memory Model
+
+The current implementation provides instruction ROM:
+
+```text
+256 × 8 bits
+```
+
+The current ISA does not define a separate data-memory address space.
+
+There are currently no architectural instructions for:
+
+* load;
+* store;
+* memory addressing;
+* memory-mapped I/O.
+
+Therefore the current ROM represents instruction storage rather than general-purpose data memory.
+
+
+
+# 24. Control Flow
+
+The current instruction set does not contain:
+
+```text
+JMP
+CALL
+RET
+conditional branch
+indirect jump
+```
+
+No current instruction directly modifies the PC.
+
+Sequential execution is currently based on:
+
+```text
+PC_next = PC + 1
+```
+
+Future control-flow instructions will require both ISA definitions and corresponding hardware changes.
+
+
+
+# 25. Flags
+
+DestByte8 currently has no architectural flags.
+
+The following are not implemented:
+
+```text
+Z = Zero
+C = Carry
+N = Negative
+V = Overflow
+B = Borrow
+```
+
+The ALU therefore produces only the 8-bit result.
+
+If flags are introduced in a future revision, their encoding, update rules, and interaction with instructions must be explicitly defined by the ISA.
+
+
+
+# 26. Reserved and Undefined Behavior
+
+The following opcode groups are reserved:
+
+```text
+10
+11
+```
+
+Corresponding ranges:
+
+```text
+0x80–0xBF
+0xC0–0xFF
+```
+
+These encodings do not currently represent valid instructions.
+
+Software must not rely on the internal behavior of reserved encodings.
+
+Future ISA revisions may assign these opcode groups to new instructions.
+
+ROM locations not explicitly initialized by the current ROM implementation are also not defined as program instructions.
+
+
+
+# 27. Current Instruction Summary
+
+```text
+┌────────┬──────────┬─────────────────────────────┐
+│ Opcode │ Mnemonic │ Operation                   │
+├────────┼──────────┼─────────────────────────────┤
+│ 00     │ ADD      │ T[D] ← T[D] + T[S]         │
+│ 01     │ SUB      │ T[D] ← T[D] - T[S]         │
+│ 10     │ —        │ Reserved                    │
+│ 11     │ —        │ Reserved                    │
+└────────┴──────────┴─────────────────────────────┘
+```
+
+
+
+# 28. Complete Byte Layout
+
+The complete instruction byte is:
+
+```text
+7       6 5       3 2       0
+┌─────────┬─────────┬─────────┐
+│  OPCODE │    D    │    S    │
+│  2 bits │  3 bits │  3 bits │
+└─────────┴─────────┴─────────┘
+```
+
+Interpretation:
+
+```text
+instruction[7:6] → operation
+instruction[5:3] → destination / first operand
+instruction[2:0] → second operand
+```
+
+Example:
+
+```text
+0x53 = 01010011
+       ──┬─┬───
+         │ │
+         │ └── S = 011 = T3
+         └──── D = 010 = T2
+       opcode = 01 = SUB
+```
+
+Therefore:
+
+```text
+0x53 = SUB T2,T3
+```
+
+
+# 29. ISA Capacity
+
+The current instruction format allocates:
+
+```text
+2 bits → opcode
+3 bits → destination
+3 bits → source
+```
+
+This provides:
+
+```text
+4 opcode groups
+8 destination registers
+8 source registers
+```
+
+Total possible byte encodings:
+
+```text
+4 × 8 × 8 = 256
+```
+
+Current allocation:
+
+```text
+64 ADD encodings
+64 SUB encodings
+128 reserved encodings
+```
+
+The two reserved opcode groups provide room for future ISA expansion while preserving the current 8-bit instruction width.
+
+# 30. Current Limitations
+
+The following features are not currently implemented as ISA instructions:
+
+* immediate operands;
+* load;
+* store;
+* logical operations;
+* shifts;
+* comparisons;
+* branches;
+* jumps;
+* calls;
+* returns;
+* stack operations;
+* flags;
+* interrupts;
+* exceptions;
+* I/O instructions;
+* privileged execution modes.
+
+These features must not be considered part of DestByte8 until their encoding, semantics, hardware implementation, and verification are defined.
+
+
+
+# 31. RTL Implementation Structure
+
+The current repository separates the processor into hardware modules.
+
+```text
+alu/
+    alu.v
+
+memory/
+    registers_memory.v
+
+rom/
+    rom.v
+
+rtl/
+    decoder.v
+    pc.v
+    pc_next.v
+    top.v
+
+control/
+    control_unit.v
+
+sim/
+    simulation infrastructure
+```
+
+Current module responsibilities:
+
+| Module               | Responsibility                       |
+| -------------------- | ------------------------------------ |
+| `alu.v`              | Arithmetic operations                |
+| `registers_memory.v` | Register storage and register access |
+| `rom.v`              | Instruction storage                  |
+| `decoder.v`          | Instruction decoding                 |
+| `pc.v`               | Program Counter register             |
+| `pc_next.v`          | Sequential PC-next calculation       |
+| `control_unit.v`     | Control logic under development      |
+| `top.v`              | CPU integration                      |
+
+The exact behavior of `control_unit.v` must be added to this specification once its interface and role in the datapath are finalized.
+
+---
+
+# 32. Verification Status
+
+The current RTL has been successfully compiled with Verilator.
+
+The current simulation has verified sequential PC advancement under the tested reset conditions:
+
+```text
+PC: 0
+PC: 1
+PC: 2
+PC: 3
+...
+```
+
+This verifies the tested PC progression.
+
+It does **not**, by itself, verify:
+
+* correct instruction decoding;
+* correct register reads;
+* correct ALU operation;
+* correct register write-back;
+* correct execution of ADD;
+* correct execution of SUB;
+* correct behavior of reserved opcodes.
+
+Those behaviors require dedicated simulation tests.
+
+---
+
+# 33. Architectural Status
+
+The current DestByte8 ISA consists of:
+
+```text
+8-bit data
+8-bit instructions
+8 registers
+8-bit PC
+256-byte instruction address space
+ADD
+SUB
+```
+
+Current opcode allocation:
+
+```text
+00 = ADD
+01 = SUB
+10 = RESERVED
+11 = RESERVED
+```
+
+The architecture is intentionally minimal.
+
+Future features should be added by explicitly defining:
+
+1. instruction encoding;
+2. instruction semantics;
+3. architectural state changes;
+4. RTL implementation;
+5. verification tests;
+6. documentation.
+
+The ISA specification should describe behavior that has been intentionally defined and implemented, while implementation-specific details should remain identified as RTL behavior.
+
+---
+
+# Appendix A — Register Encoding
+
+```text
+000 = T0
+001 = T1
+010 = T2
+011 = T3
+100 = T4
+101 = T5
+110 = T6
+111 = T7
+```
+
+---
+
+# Appendix B — Opcode Encoding
+
+```text
+00 = ADD
+01 = SUB
+10 = RESERVED
+11 = RESERVED
+```
+
+---
+
+# Appendix C — Representative Encodings
+
+```text
+0x00 = ADD T0,T0
+0x01 = ADD T0,T1
+0x02 = ADD T0,T2
+0x07 = ADD T0,T7
+
+0x08 = ADD T1,T0
+0x10 = ADD T2,T0
+0x18 = ADD T3,T0
+0x20 = ADD T4,T0
+0x28 = ADD T5,T0
+0x30 = ADD T6,T0
+0x38 = ADD T7,T0
+0x3F = ADD T7,T7
+
+0x40 = SUB T0,T0
+0x41 = SUB T0,T1
+0x48 = SUB T1,T0
+0x50 = SUB T2,T0
+0x53 = SUB T2,T3
+0x60 = SUB T4,T0
+0x70 = SUB T6,T0
+0x78 = SUB T7,T0
+0x7F = SUB T7,T7
+
+0x80–0xBF = RESERVED
+0xC0–0xFF = RESERVED
+```
 DestByte8 CPU Architecture Specification
 
 Document: Technical Architecture Specification
