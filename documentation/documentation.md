@@ -430,7 +430,7 @@ we = reg_we & ~reset
 
 See the top-level implementation.
 
-The values stored in T0–T7 are not explicitly initialized by the current register file module during reset. Therefore, their post-reset values should be considered unspecified in the current architectural revision.
+Values stored in T0–T7 are explicitly initialized or reset by the current logger file module during the reset to ensure a stable and proper boot.
 
 16. Current Core Interface
 
