@@ -38,17 +38,17 @@ module top (
         .reg_we(reg_we)
     );
 
-    registers_memory m_regs (
-        .clk(clk),
-        .we(reg_we & ~reset),           
-        .w_addr(w_addr),
-        .reset(reset),       
-        .r_addr1(r_addr1),     
-        .r_addr2(r_addr2),     
-        .w_data(alu_result),   
-        .r_data1(r_data1),     
-        .r_data2(r_data2)      
-    );
+registers_memory m_regs (
+    .clk(clk),
+    .we(reg_we & ~reset),
+    .w_addr(w_addr),
+    .reset(reset),
+    .r_addr1(r_addr1),
+    .r_addr2(r_addr2),
+    .w_data(alu_result),
+    .r_data1(r_data1),
+    .r_data2(r_data2)
+);
 
     alu m_alu (
         .a(r_data1),             
