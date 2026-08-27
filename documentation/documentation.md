@@ -40,7 +40,7 @@ Current ALU operations	Addition and subtraction
 Instruction memory	ROM
 ROM address width	8 bits
 ROM address space	256 positions
-Reset	Asynchronous reset on the PC
+Reset	Asynchronous reset on the PC and register file
 PC increment	+1 on each rising clock edge
 Flags	Not implemented in the current RTL
 Pipeline	Not implemented in the current RTL
@@ -418,11 +418,16 @@ The hexadecimal representation of the instruction is:
 The current reset behavior explicitly affects:
 
 * the Program Counter;
+* the register file;
 * register file write enable.
 
 The PC is set to:
 
 0x00
+
+During reset, T0–T7 are also explicitly reset to:
+
+T0–T7 = 0x00
 
 In addition, top.v prevents register file writes while reset is active:
 
@@ -430,7 +435,7 @@ we = reg_we & ~reset
 
 See the top-level implementation.
 
-Values stored in T0–T7 are explicitly initialized or reset by the current logger file module during the reset to ensure a stable and proper boot.
+The register file resets all eight registers to 0x00 when reset is asserted.
 
 16. Current Core Interface
 
