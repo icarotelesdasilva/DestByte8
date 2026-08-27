@@ -1,16 +1,27 @@
 # DestByte8 CPU Architecture Specification
 
 **Architecture:** DestByte8
+
 **Class:** 8-bit CPU
+
 **Instruction width:** 8 bits
+
 **Data width:** 8 bits
+
 **Register count:** 8
+
 **Register width:** 8 bits
+
 **Program Counter width:** 8 bits
+
 **Instruction memory:** 256 × 8 bits
+
 **ISA status:** Initial implementation
+
 **Hardware description:** Verilog RTL
+
 **Hardware license:** CERN Open Hardware Licence Version 2 — Strongly Reciprocal (CERN-OHL-S)
+
 
 
 ## 1. Overview
