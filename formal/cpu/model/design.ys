@@ -1,0 +1,10 @@
+# running in cpu/src/
+read_verilog -formal pc.v
+read_verilog -formal pc_next.v
+read_verilog -formal pc_formal.sv
+prep -top pc_formal
+
+hierarchy -smtcheck
+rename -witness
+write_jny -no-connections ../model/design.json
+write_rtlil ../model/design.il

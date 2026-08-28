@@ -1,0 +1,127 @@
+
+ /----------------------------------------------------------------------------\
+ |  yosys -- Yosys Open SYnthesis Suite                                       |
+ |  Copyright (C) 2012 - 2025  Claire Xenia Wolf <claire@yosyshq.com>         |
+ |  Distributed under an ISC-like license, type "license" to see terms        |
+ \----------------------------------------------------------------------------/
+ Yosys 0.52 (git sha1 fee39a3284c90249e1d9684cf6944ffbbcbb8f90)
+
+-- Executing script file `design_smt2.ys' --
+
+1. Executing RTLIL frontend.
+Input filename: design_prep.il
+
+2. Executing HIERARCHY pass (managing design hierarchy).
+Attribute `top' found on module `pc_formal'. Setting top module to pc_formal.
+
+2.1. Analyzing design hierarchy..
+Top module:  \pc_formal
+Used module:     \pc_next
+Used module:     \pc
+
+2.2. Analyzing design hierarchy..
+Top module:  \pc_formal
+Used module:     \pc_next
+Used module:     \pc
+Removed 0 unused modules.
+Module pc_formal directly or indirectly contains formal properties -> setting "keep" attribute.
+
+3. Executing FORMALFF pass.
+
+4. Executing DFFUNMAP pass (unmap clock enable and synchronous reset from FFs).
+
+5. Printing statistics.
+
+=== pc_next ===
+
+   Number of wires:                  2
+   Number of wire bits:             16
+   Number of public wires:           2
+   Number of public wire bits:      16
+   Number of ports:                  2
+   Number of port bits:             16
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                  1
+     $add                            1
+
+=== pc_formal ===
+
+   Number of wires:                 10
+   Number of wire bits:             24
+   Number of public wires:           4
+   Number of public wire bits:      18
+   Number of ports:                  0
+   Number of port bits:              0
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                 13
+     $anyseq                         2
+     $assert                         1
+     $assume                         2
+     $ff                             2
+     $initstate                      1
+     $logic_not                      1
+     $mux                            1
+     $not                            1
+     pc                              1
+     pc_next                         1
+
+=== pc ===
+
+   Number of wires:                  7
+   Number of wire bits:             35
+   Number of public wires:           5
+   Number of public wire bits:      26
+   Number of ports:                  4
+   Number of port bits:             18
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                  5
+     $anyinit                        1
+     $assume                         1
+     $mux                            2
+     $not                            1
+
+=== design hierarchy ===
+
+   pc_formal                         1
+     pc                              1
+     pc_next                         1
+
+   Number of wires:                 19
+   Number of wire bits:             75
+   Number of public wires:          11
+   Number of public wire bits:      60
+   Number of ports:                  6
+   Number of port bits:             34
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                 17
+     $add                            1
+     $anyinit                        1
+     $anyseq                         2
+     $assert                         1
+     $assume                         3
+     $ff                             2
+     $initstate                      1
+     $logic_not                      1
+     $mux                            3
+     $not                            2
+
+6. Executing SMT2 backend.
+
+6.1. Executing BMUXMAP pass.
+
+6.2. Executing DEMUXMAP pass.
+Creating SMT-LIBv2 representation of module pc.
+Creating SMT-LIBv2 representation of module pc_next.
+Creating SMT-LIBv2 representation of module pc_formal.
+
+End of script. Logfile hash: e1355fc035, CPU: user 0.01s system 0.01s, MEM: 15.50 MB peak
+Yosys 0.52 (git sha1 fee39a3284c90249e1d9684cf6944ffbbcbb8f90)
+Time spent: 70% 2x write_smt2 (0 sec), 13% 2x read_rtlil (0 sec), ...

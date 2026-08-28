@@ -1,0 +1,17 @@
+[options]
+mode prove
+depth 20
+
+[engines]
+smtbmc z3
+
+[script]
+read_verilog -formal pc.v
+read_verilog -formal pc_next.v
+read_verilog -formal pc_formal.sv
+prep -top pc_formal
+
+[files]
+../rtl/pc.v
+../rtl/pc_next.v
+pc_formal.sv
