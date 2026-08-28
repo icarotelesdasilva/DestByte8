@@ -2,30 +2,24 @@
 
 clear
 
-read -r -p "Do you want to build DestByte8? (yes/no): " answer
+read -r -p "Do you want to build DestByte8 memory test? (yes/no): " answer
 
 case "$answer" in
     yes|y|YES|Y)
-        echo "Building DestByte8 with Verilator..."
+        echo "Building DestByte8 data memory test with Verilator..."
 
         verilator --binary \
-            --trace --trace-structs \
             --timing \
             -Wall \
             -Wno-fatal \
+            -Wno-BLKSEQ \
             -O3 \
             --x-assign fast \
             --x-initial fast \
-            --top-module tb_test \
-            -Mdir ./obj_dir \
-            ./rtl/top.v \
-            ./rtl/pc_next.v \
-            ./rtl/decoder.v \
-            ./rtl/pc.v \
-            ./alu/alu.v \
-            ./memory/registers_memory.v \
-            ./rom/rom.v \
-            ./sim/tb.v
+            --top-module tb_memory \
+            -Mdir ./obj_dir_memory \
+            ./memory/data_memory.v \
+            ./sim/tb_memory.v
 
         if [[ $? -ne 0 ]]; then
             echo "Build failed."
@@ -34,22 +28,22 @@ case "$answer" in
 
         echo "Build completed successfully."
 
-        read -r -p "Do you want to run DestByte8? (yes/no): " run_answer
+        read -r -p "Do you want to run the memory test? (yes/no): " run_answer
 
         case "$run_answer" in
             yes|y|YES|Y)
-                echo "Starting DestByte8..."
+                echo "Starting data memory test..."
 
-                if [[ ! -x "./obj_dir/Vtb_test" ]]; then
-                    echo "Error: ./obj_dir/Vtb_test was not found."
+                if [[ ! -x "./obj_dir_memory/Vtb_memory" ]]; then
+                    echo "Error: ./obj_dir_memory/Vtb_memory was not found."
                     exit 1
                 fi
 
-                ./obj_dir/Vtb_test
+                ./obj_dir_memory/Vtb_memory
                 ;;
 
             no|n|NO|N)
-                echo "DestByte8 was not started."
+                echo "Memory test was not started."
                 ;;
 
             *)

@@ -22,6 +22,12 @@ int main(int argc, char** argv) {
 
         top->eval();
 
+  /*
+ 
+ * Warning: This code is just to keep the simulation 
+ * of those who want to test close to the hardware, the cpu is not simulation.
+ 
+ */
         if (top->clk == 1) {
            std::cout << "Cycle: " << std::dec << cycle
           << " | Reset: " << (int)top->reset

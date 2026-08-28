@@ -1,7 +1,12 @@
+
 module tb_test;
 
+reg [7:0] address_tb;
+reg [7:0] write_data_tb;
+reg write_enable_tb;
 reg clk;
 reg reset;
+
 wire [7:0] result;
 wire [7:0] pc_debug;
 
@@ -11,8 +16,9 @@ top dut (
     .result(result),
     .pc_debug(pc_debug)
 );
-  
-  
+
+always #5 clk = ~clk;
+
 
   /*
  
@@ -20,8 +26,6 @@ top dut (
  * of those who want to test close to the hardware, the cpu is not simulation.
  
  */
-
-always #5 clk = ~clk;
 
 initial begin
     clk = 0;
@@ -31,15 +35,39 @@ initial begin
 
     reset = 0;
 
-    dut.m_regs.T[1] = 8'h05;
+    dut.m_data_memory.write_enable = 1'b1;
+    dut.m_data_memory.address = 8'h10;
+    dut.m_data_memory.write_data = 8'h55;
 
-    #20;
+    #10;
 
-    $display("T0 = %h", dut.m_regs.T[0]);
-    $display("T1 = %h", dut.m_regs.T[1]);
-    $display("PC = %h", pc_debug);
+    dut.m_data_memory.write_enable = 1'b0;
+
+    #10;
+
+    $display("Memory[10] = %h", dut.m_data_memory.read_data);
+
+    // Escreve 0xAA no endereço 0x20
+    dut.m_data_memory.write_enable = 1'b1;
+    dut.m_data_memory.address = 8'h20;
+    dut.m_data_memory.write_data = 8'hAA;
+
+    #10;
+
+    dut.m_data_memory.write_enable = 1'b0;
+
+    #10;
+
+    $display("Memory[20] = %h", dut.m_data_memory.read_data);
+
+    dut.m_data_memory.address = 8'h10;
+
+    #10;
+
+    $display("Memory[10] again = %h", dut.m_data_memory.read_data);
 
     $finish;
 end
 
 endmodule
+
