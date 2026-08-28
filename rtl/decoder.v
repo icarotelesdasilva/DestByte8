@@ -28,9 +28,20 @@ always @(*) begin
             reg_we      = 1'b1;
         end
         
+         
+       2'b10: begin
+           
+           alu_control = 3'b010;
+           reg_we = 1'b1;
+
+           end
+
         default: begin
             alu_control = 3'b000;
             reg_we      = 1'b0;
+
+       
+
         end
     endcase
 end

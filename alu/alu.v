@@ -12,6 +12,7 @@ always @(*) begin
     case (alu_control)
         3'b000: result = a + b; 
         3'b001: result = a - b; 
+        3'b010: result = b;
         default: result = 8'h00;
     endcase
 end

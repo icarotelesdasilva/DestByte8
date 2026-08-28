@@ -8,25 +8,24 @@ case "$answer" in
     yes|y|YES|Y)
         echo "Building DestByte8 with Verilator..."
 
-verilator --cc --exe --build \
-    --trace --trace-structs \
-    --timing \
-    -Wall \
-    -Wno-fatal \
-    -O3 \
-    --x-assign fast \
-    --x-initial fast \
-    --top-module top \
-    -Mdir ./obj_dir \
-    -o ./cpu_sim \
-    ./rtl/top.v \
-    ./rtl/pc_next.v \
-    ./rtl/decoder.v \
-    ./rtl/pc.v \
-    ./alu/alu.v \
-    ./memory/registers_memory.v \
-    ./rom/rom.v \
-    ./sim/sim_main.cpp
+        verilator --binary \
+            --trace --trace-structs \
+            --timing \
+            -Wall \
+            -Wno-fatal \
+            -O3 \
+            --x-assign fast \
+            --x-initial fast \
+            --top-module tb_test \
+            -Mdir ./obj_dir \
+            ./rtl/top.v \
+            ./rtl/pc_next.v \
+            ./rtl/decoder.v \
+            ./rtl/pc.v \
+            ./alu/alu.v \
+            ./memory/registers_memory.v \
+            ./rom/rom.v \
+            ./sim/tb.v
 
         if [[ $? -ne 0 ]]; then
             echo "Build failed."
@@ -41,13 +40,12 @@ verilator --cc --exe --build \
             yes|y|YES|Y)
                 echo "Starting DestByte8..."
 
-                if [[ ! -x "./obj_dir/cpu_sim" ]]; then
-                    echo "Error: ./obj_dir/cpu_sim was not found."
+                if [[ ! -x "./obj_dir/Vtb_test" ]]; then
+                    echo "Error: ./obj_dir/Vtb_test was not found."
                     exit 1
                 fi
 
-                cd ./obj_dir || exit 1
-                ./cpu_sim
+                ./obj_dir/Vtb_test
                 ;;
 
             no|n|NO|N)
