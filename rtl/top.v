@@ -65,7 +65,6 @@ registers_memory m_regs (
     );
 
     assign result = alu_result;
-    assign result = alu_result;
     assign pc_debug = end_pc;
 
 endmodule
