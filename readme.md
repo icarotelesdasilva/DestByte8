@@ -14,6 +14,7 @@ To design, implement, and evolve a  instruction set architecture (ISA) and proce
 * Have verilator installed.
 * Have any linux system.
 * Having these requirements use this command: `chmod +x run.sh` `./run.sh`.
+
 Check out the video demonstration:
 
 [Tutorial](./media/media.mp4)
