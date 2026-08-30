@@ -11,10 +11,10 @@
                     reg [7:0] memory [0:255];
 
                     initial begin
-                        memory[0] = 8'h81; 
+                        memory[0] = 8'b00001010;
                         memory[1] = 8'h20;
                     end
 
                     assign data = memory[addr];
-
+                   
                 endmodule

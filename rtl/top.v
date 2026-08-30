@@ -8,6 +8,8 @@
                             output wire [7:0] result,
                             output wire [7:0] pc_debug
                         );
+                            wire [7:0] immediate;
+                            wire [7:0] alu_b;
                             wire mem_we;
                             wire [7:0] next_pc;
                             wire [7:0] end_pc;
@@ -66,7 +68,7 @@
 
                             alu m_alu (
                                 .a(r_data1),
-                                .b(r_data2),
+                                .b(alu_b),
                                 .alu_control(cf),
                                 .result(alu_result)
                             );
@@ -84,5 +86,6 @@
 
                             assign result = alu_result;
                             assign pc_debug = end_pc;
-
+                            assign immediate = {5'b00000, dd[2:0]};
+                            assign alu_b = (dd[7:6] == 2'b00) ? immediate : r_data2;
                         endmodule
