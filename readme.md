@@ -27,4 +27,7 @@ For detailed technical specifications, instructions, and implementation details,
 
 ## License
 This project is protected by the **CERN Open Hardware Licence Version 2 - Strongly Reciprocal**.
-https://raw.githubusercontent.com/czl9707/gh-space-shooter/main/example.gif
+<p align="center">
+  <img src="https://raw.githubusercontent.com/czl9707/gh-space-shooter/main/example.gif" alt="Space shooter contribution graph" />
+</p>
+
